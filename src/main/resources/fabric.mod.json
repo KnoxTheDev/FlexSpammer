@@ -3,7 +3,7 @@
   "id": "flex-spammer",
   "version": "${version}",
   "name": "FlexSpammer",
-  "description": "Automatically sends flex messages in chat. Built for Meteor Client.",
+  "description": "A highly flexible and customizable chat spamming addon for Meteor Client.",
   "authors": [
     "KnoxTheDev"
   ],
