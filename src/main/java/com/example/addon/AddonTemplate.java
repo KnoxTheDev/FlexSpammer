@@ -3,8 +3,8 @@ package com.example.addon;
 import com.example.addon.modules.FlexSpammer;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
-import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Categories;
+import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import org.slf4j.Logger;
 
@@ -18,11 +18,6 @@ public class AddonTemplate extends MeteorAddon {
 
         // Register modules
         Modules.get().add(new FlexSpammer());
-    }
-
-    @Override
-    public void onRegisterCategories() {
-        Modules.registerCategory(CATEGORY);
     }
 
     @Override
