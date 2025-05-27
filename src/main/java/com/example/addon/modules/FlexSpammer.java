@@ -46,7 +46,7 @@ public class FlexSpammer extends Module {
             String suffix = String.valueOf(asciiChars[index]);
             String fullMessage = baseMessage.get() + "     " + suffix;
 
-            mc.player.networkHandler.sendPacket(new ChatMessageC2SPacket(Text.of(fullMessage)));
+            mc.player.networkHandler.sendPacket(new ChatMessageC2SPacket(fullMessage));
 
             index = (index + 1) % asciiChars.length;
             lastMessageTime = System.currentTimeMillis();
