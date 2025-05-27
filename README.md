@@ -17,7 +17,7 @@
 ## 🔧 How to Use
 
 1. **Install Meteor Client.**
-2. **Download the `FlexSpammer` addon `.jar`** from [Releases](https://github.com/KnoxTheDev/FlexSpammer/releases).
+2. **Download the `FlexSpammer.jar` addon** from [Releases](https://github.com/KnoxTheDev/FlexSpammer/releases).
 3. Move the `.jar` into:
    ```
    .minecraft/meteor-client/addons/
