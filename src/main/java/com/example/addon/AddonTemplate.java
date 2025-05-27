@@ -1,6 +1,6 @@
 package com.example.addon;
 
-import com.example.addon.modules.ModuleTemplate;
+import com.example.addon.modules.ModuleExample;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
@@ -17,7 +17,7 @@ public class AddonTemplate extends MeteorAddon {
         LOG.info("Initializing Flex Spammer Addon");
 
         // Register modules
-        Modules.get().add(new ModuleTemplate());
+        Modules.get().add(new ModuleExample());
     }
 
     @Override
