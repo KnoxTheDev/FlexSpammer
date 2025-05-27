@@ -1,85 +1,97 @@
-# Meteor Addon Template
+# FlexSpammer
 
-A template to allow easy usage of the Meteor Addon API.
+**FlexSpammer** is a customizable [Meteor Client](https://github.com/MeteorDevelopment/meteor-client) addon module designed for sending messages in Minecraft chat at configurable intervals. It introduces dynamic variations in each message to bypass spam filters and debouncing.
 
-### How to use
+---
 
-- Clone this project
-- Use this template to create new modules/commands
-- Build the executable using the gradle `build` task.
-- Run the mod with Meteor.
+## 🌟 Features
 
-### Project structure
+- 🧠 **Flexible base message** — Customize what the module sends.
+- ⏱️ **Adjustable delay** — Set your own time interval between messages (in milliseconds).
+- 🔁 **Dynamic variation** — Each message includes a changing character to bypass anti-spam.
+- 🎮 Built for **Minecraft 1.21.5** and Meteor Client.
+- 🧩 Lightweight, modular, and easy to integrate.
 
-```text
-.
-│── .github
-│   ╰── workflows
-│       │── dev_build.yml
-│       ╰── pull_request.yml
-│── gradle
-│   ╰── wrapper
-│       │── gradle-wrapper.jar
-│       ╰── gradle-wrapper.properties
-│── src
-│   ╰── main
-│       │── java
-│       │   ╰── com
-│       │       ╰── example
-│       │           ╰── addon
-│       │               │── commands
-│       │               │   ╰── CommandExample
-│       │               │── hud
-│       │               │   ╰── HudExample
-│       │               │── modules
-│       │               │   ╰── ModuleExample
-│       │               ╰── AddonTemplate
-│       ╰── resources
-│           │── assets
-│           │   ╰── template
-│           │       ╰── icon.png
-│           │── addon-template.mixins.json
-│           ╰── fabric.mod.json
-│── .editorconfig
-│── .gitignore
-│── build.gradle
-│── gradle.properties
-│── gradlew
-│── gradlew.bat
-│── LICENSE
-│── README.md
-╰── settings.gradle
+---
+
+## 🔧 How to Use
+
+1. **Install Meteor Client.**
+2. **Download the `FlexSpammer` addon `.jar`** from [Releases](https://github.com/KnoxTheDev/FlexSpammer/releases).
+3. Move the `.jar` into:
+   ```
+   .minecraft/meteor-client/addons/
+   ```
+4. Start Minecraft with Meteor Client.
+
+---
+
+## 🛠️ Configuration
+
+Once in-game:
+
+1. Press `Right Shift` to open the Meteor GUI.
+2. Search for `FlexSpammer` (under the **Misc** category).
+3. Enable the module and customize:
+   - **Base Message**: What will be sent.
+   - **Delay**: How often (in ms) the message is sent.
+
+Each message includes a rotating suffix from the ASCII set (`a` to `Z` to `0–9`) to avoid duplication and server-side debounce filters.
+
+---
+
+## 🧩 Module Details
+
+**Module Name:** `Flex Spammer`  
+**Category:** `Misc`  
+**Description:** Sends a message repeatedly with a randomized suffix to bypass spam detection.
+
+> Base functionality is in `FlexSpammer.java`, dynamically appending suffix characters from a predefined ASCII array.
+
+---
+
+## 📁 Project Structure
+
+```
+com.example.addon/
+├── AddonTemplate.java        # Main addon class, registers the category and module
+└── modules/
+    └── FlexSpammer.java      # Main logic of the FlexSpammer module
 ```
 
-This is the default project structure. Each folder/file has a specific purpose.  
-Here is a brief explanation of the ones you might need to modify:
+---
 
-- `.github/workflows`: Contains the GitHub Actions configuration files.
-- `gradle`: Contains the Gradle wrapper files.  
-  Edit the `gradle.properties` file to change the version of the Gradle wrapper.
-- `src/main/java/com/example/addon`: Contains the main class of the addon.  
-  Here you can register your custom commands, modules, and HUDs.  
-  Edit the `getPackage` method to reflect the package of your addon.
-- `src/main/resources`: Contains the resources of the addon.
-    - `assets`: Contains the assets of the addon.  
-      You can add your own assets here, separated in subfolders.
-        - `template`: Contains the assets of the template.  
-          You can replace the `icon.png` file with your own addon icon.  
-          Also, rename this folder to reflect the name of your addon.
-    - `addon-template.mixins.json`: Contains the Mixin configuration for the addon.  
-      You can add your own mixins in the `client` array.
-    - `fabric.mod.json`: Contains the metadata of the addon.  
-      Edit the various fields to reflect the metadata of your addon.
-- `build.gradle.kts`: Contains the Gradle build script.  
-  You can manage the dependencies of the addon here.  
-  Remember to keep the `fabric-loom` version up-to-date.
-- `gradle.properties.kts`: Contains the properties of the Gradle build.  
-  These will be used by the build script.
-- `LICENSE`: Contains the license of the addon.  
-  You can edit this file to change the license of your addon.
-- `README.md`: Contains the documentation of the addon.  
-  You can edit this file to reflect the documentation of your addon, and showcase its features.
+## 👨‍💻 Developer Notes
 
-## License
+To build from source:
 
-This template is available under the CC0 license. Feel free to use it for your own projects.
+```bash
+./gradlew build
+```
+
+Output will be in:
+
+```
+build/libs/
+```
+
+Deploy the `.jar` to your Meteor Client `addons/` directory.
+
+---
+
+## 🧾 License
+
+This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
+
+---
+
+## 🤝 Credits
+
+- Built with ❤️ on top of the Meteor Client addon framework
+- Inspired by fun and flexibility for casual use
+
+---
+
+## 🔗 Repository
+
+[https://github.com/KnoxTheDev/FlexSpammer](https://github.com/KnoxTheDev/FlexSpammer)
