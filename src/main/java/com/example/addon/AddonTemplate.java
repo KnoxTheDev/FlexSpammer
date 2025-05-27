@@ -1,8 +1,7 @@
 package com.example.addon;
 
-import com.example.addon.modules.ModuleExample;
+import com.example.addon.modules.FlexSpammer;
 import com.mojang.logging.LogUtils;
-import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -14,10 +13,10 @@ public class AddonTemplate extends MeteorAddon {
 
     @Override
     public void onInitialize() {
-        LOG.info("Initializing Flex Spammer Addon");
+        LOG.info("Initializing FlexSpammer Addon");
 
         // Register modules
-        Modules.get().add(new ModuleExample());
+        Modules.get().add(new FlexSpammer());
     }
 
     @Override
@@ -28,10 +27,5 @@ public class AddonTemplate extends MeteorAddon {
     @Override
     public String getPackage() {
         return "com.example.addon";
-    }
-
-    @Override
-    public GithubRepo getRepo() {
-        return new GithubRepo("KnoxTheDev", "FlexSpammer");
     }
 }
