@@ -7,9 +7,8 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
-import net.minecraft.text.Text;
 
 public class FlexSpammer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -42,11 +41,11 @@ public class FlexSpammer extends Module {
     private void onTick(TickEvent.Post event) {
         if (System.currentTimeMillis() - lastMessageTime < delay.get()) return;
 
-        if (mc.player != null && mc.player.networkHandler != null) {
+        if (mc.player != null) {
             String suffix = String.valueOf(asciiChars[index]);
             String fullMessage = baseMessage.get() + "     " + suffix;
 
-            mc.player.networkHandler.sendPacket(new ChatMessageC2SPacket(fullMessage));
+            ChatUtils.sendPlayerMessage(fullMessage); // Updated for 1.19+ compatibility
 
             index = (index + 1) % asciiChars.length;
             lastMessageTime = System.currentTimeMillis();
