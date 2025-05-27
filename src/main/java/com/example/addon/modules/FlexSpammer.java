@@ -16,7 +16,7 @@ public class FlexSpammer extends Module {
     private final Setting<String> baseMessage = sgGeneral.add(new StringSetting.Builder()
         .name("base-message")
         .description("The message to send with random suffix.")
-        .defaultValue("@everyone Knoxius is the king and Ryan is the world's best developer.")
+        .defaultValue("Meteor on crack!")
         .build()
     );
 
