@@ -9,7 +9,7 @@
 - 🧠 **Flexible base message** — Customize what the module sends.
 - ⏱️ **Adjustable delay** — Set your own time interval between messages (in milliseconds).
 - 🔁 **Dynamic variation** — Each message includes a changing character to bypass anti-spam.
-- 🎮 Built for **Minecraft 1.21.5** and Meteor Client.
+- 🎮 Built for **Minecraft 1.21.5, 1.21.4, 1.21.3** and Meteor Client.
 - 🧩 Lightweight, modular, and easy to integrate.
 
 ---
