@@ -1,66 +1,70 @@
 package com.example.addon.modules;
 
 import com.example.addon.AddonTemplate;
-import meteordevelopment.meteorclient.events.render.Render3DEvent;
-import meteordevelopment.meteorclient.renderer.ShapeMode;
-import meteordevelopment.meteorclient.settings.ColorSetting;
-import meteordevelopment.meteorclient.settings.DoubleSetting;
-import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.render.color.Color;
-import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 
 public class ModuleExample extends Module {
-    private final SettingGroup sgGeneral = this.settings.getDefaultGroup();
-    private final SettingGroup sgRender = this.settings.createGroup("Render");
+    private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
-    /**
-     * Example setting.
-     * The {@code name} parameter should be in kebab-case.
-     * If you want to access the setting from another class, simply make the setting {@code public}, and use
-     * {@link meteordevelopment.meteorclient.systems.modules.Modules#get(Class)} to access the {@link Module} object.
-     */
-    private final Setting<Double> scale = sgGeneral.add(new DoubleSetting.Builder()
-        .name("scale")
-        .description("The size of the marker.")
-        .defaultValue(2.0d)
-        .range(0.5d, 10.0d)
+    // Settings
+    private final Setting<String> baseMessage = sgGeneral.add(new StringSetting.Builder()
+        .name("base-message")
+        .description("Base message to spam.")
+        .defaultValue("Knoxius is the king and Ryan is world's best dev.")
         .build()
     );
 
-    private final Setting<SettingColor> color = sgRender.add(new ColorSetting.Builder()
-        .name("color")
-        .description("The color of the marker.")
-        .defaultValue(Color.MAGENTA)
+    private final Setting<Integer> interval = sgGeneral.add(new IntSetting.Builder()
+        .name("interval")
+        .description("Delay between messages in milliseconds.")
+        .defaultValue(3050)
+        .min(500)
+        .sliderMax(10000)
         .build()
     );
 
-    /**
-     * The {@code name} parameter should be in kebab-case.
-     */
-    public ModuleExample() {
-        super(AddonTemplate.CATEGORY, "world-origin", "An example module that highlights the center of the world.");
+    private final Setting<String> suffixChars = sgGeneral.add(new StringSetting.Builder()
+        .name("suffix-chars")
+        .description("Characters used for suffix variation.")
+        .defaultValue("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        .build()
+    );
+
+    private int index = 0;
+    private long lastMessageTime = 0L;
+
+    public FlexSpammer() {
+        super(AddonTemplate.CATEGORY, "flex-spammer", "Spams chat with a flexible message and suffix variation.");
     }
 
-    /**
-     * Example event handling method.
-     * Requires {@link AddonTemplate#getPackage()} to be setup correctly, otherwise the game will crash whenever the module is enabled.
-     */
-    @EventHandler
-    private void onRender3d(Render3DEvent event) {
-        // Create & stretch the marker object
-        Box marker = new Box(BlockPos.ORIGIN);
-        marker = marker.stretch(
-            scale.get() * marker.getLengthX(),
-            scale.get() * marker.getLengthY(),
-            scale.get() * marker.getLengthZ()
-        );
+    @Override
+    public void onActivate() {
+        index = 0;
+        lastMessageTime = 0L;
+    }
 
-        // Render the marker based on the color setting
-        event.renderer.box(marker, color.get(), color.get(), ShapeMode.Both, 0);
+    @Override
+    public void onTick() {
+        if (mc.player == null || mc.world == null) return;
+
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastMessageTime < interval.get()) return;
+
+        String suffix = "";
+        String chars = suffixChars.get();
+        if (!chars.isEmpty()) {
+            suffix = "     " + chars.charAt(index); // 5 spaces + suffix char
+            index = (index + 1) % chars.length();
+        }
+
+        String msg = baseMessage.get() + suffix;
+
+        mc.player.networkHandler.sendPacket(new ChatMessageC2SPacket(msg));
+        info("Sent: " + msg.replace(" ", "·"));
+
+        lastMessageTime = currentTime;
     }
 }
