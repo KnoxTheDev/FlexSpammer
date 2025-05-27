@@ -7,7 +7,6 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 
 public class FlexSpammer extends Module {
@@ -16,7 +15,7 @@ public class FlexSpammer extends Module {
     private final Setting<String> baseMessage = sgGeneral.add(new StringSetting.Builder()
         .name("base-message")
         .description("The message to send with random suffix.")
-        .defaultValue("@everyone Knoxius is the king and Ryan is the world's best developer.")
+        .defaultValue("@everyone Knoxius is the king.")
         .build()
     );
 
@@ -45,7 +44,7 @@ public class FlexSpammer extends Module {
             String suffix = String.valueOf(asciiChars[index]);
             String fullMessage = baseMessage.get() + "     " + suffix;
 
-            ChatUtils.sendPlayerMessage(fullMessage); // Updated for 1.19+ compatibility
+            mc.player.sendChatMessage(fullMessage); // Sends the chat message
 
             index = (index + 1) % asciiChars.length;
             lastMessageTime = System.currentTimeMillis();
