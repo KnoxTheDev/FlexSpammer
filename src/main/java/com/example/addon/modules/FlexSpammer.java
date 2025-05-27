@@ -9,8 +9,8 @@ import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
-import net.minecraft.text.Text;
-import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
+import net.minecraft.text.Text; // Although Text is imported, it's not strictly needed for sending raw strings.
+// import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents; // This import is no longer needed
 
 public class FlexSpammer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -45,10 +45,10 @@ public class FlexSpammer extends Module {
 
         if (mc.player != null) {
             String suffix = String.valueOf(asciiChars[index]);
-            String fullMessage = baseMessage.get() + "     " + suffix;
+            String fullMessage = baseMessage.get() + "       " + suffix; // Added more spaces for better visibility of suffix
 
-            // Send chat message
-            ClientSendMessageEvents.ALLOW_CHAT.invoker().allowChat(fullMessage);
+            // Correct way to send a chat message from the client
+            mc.player.networkHandler.sendPacket(new ChatMessageC2SPacket(fullMessage));
 
             index = (index + 1) % asciiChars.length;
             lastMessageTime = System.currentTimeMillis();
