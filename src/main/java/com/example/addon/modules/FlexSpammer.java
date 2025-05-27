@@ -4,11 +4,12 @@ import com.example.addon.AddonTemplate;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.text.Text;
 
 public class FlexSpammer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -16,7 +17,7 @@ public class FlexSpammer extends Module {
     private final Setting<String> baseMessage = sgGeneral.add(new StringSetting.Builder()
         .name("base-message")
         .description("The message to send with random suffix.")
-        .defaultValue("Knoxius is the king and Ryan is world's best dev.")
+        .defaultValue("@everyone Knoxius is the king and Ryan is the world's best developer.")
         .build()
     );
 
@@ -43,10 +44,9 @@ public class FlexSpammer extends Module {
 
         if (mc.player != null && mc.player.networkHandler != null) {
             String suffix = String.valueOf(asciiChars[index]);
-            String fullMessage = baseMessage.get() + "     " + suffix; // 5 spaces
+            String fullMessage = baseMessage.get() + "     " + suffix;
 
-            mc.player.networkHandler.sendPacket(new ChatMessageC2SPacket(fullMessage));
-            info("Sent: " + fullMessage.replace(" ", "·"));
+            mc.player.networkHandler.sendPacket(new ChatMessageC2SPacket(Text.of(fullMessage)));
 
             index = (index + 1) % asciiChars.length;
             lastMessageTime = System.currentTimeMillis();
