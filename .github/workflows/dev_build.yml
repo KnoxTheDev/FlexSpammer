@@ -36,7 +36,7 @@ jobs:
       run: rm ./build/libs/*-dev.jar || true
     - uses: marvinpinto/action-automatic-releases@latest
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: "latest-1.21.5"
         prerelease: false
         title: "1.21.5 Build"
