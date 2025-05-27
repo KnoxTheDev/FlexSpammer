@@ -36,7 +36,7 @@ public class ModuleExample extends Module {
     private int index = 0;
     private long lastMessageTime = 0L;
 
-    public FlexSpammer() {
+    public ModuleExample() {
         super(AddonTemplate.CATEGORY, "flex-spammer", "Spams chat with a flexible message and suffix variation.");
     }
 
