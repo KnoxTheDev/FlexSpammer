@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "id": "addon-template",
+  "id": "flex-spammer",
   "version": "${version}",
-  "name": "Addon Template",
-  "description": "An addon template for Meteor Client addons.",
+  "name": "FlexSpammer",
+  "description": "Automatically sends flex messages in chat. Built for Meteor Client.",
   "authors": [
-    "seasnail"
+    "KnoxTheDev"
   ],
   "contact": {
-    "repo": "https://github.com/MeteorDevelopment/meteor-addon-template"
+    "repo": "https://github.com/KnoxTheDev/FlexSpammer"
   },
   "icon": "assets/template/icon.png",
   "environment": "client",
