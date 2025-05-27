@@ -7,8 +7,10 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
+import net.minecraft.text.Text;
+import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 
 public class FlexSpammer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -45,7 +47,8 @@ public class FlexSpammer extends Module {
             String suffix = String.valueOf(asciiChars[index]);
             String fullMessage = baseMessage.get() + "     " + suffix;
 
-            ChatUtils.sendPlayerMessage(fullMessage); // Sends the chat message
+            // Send chat message
+            ClientSendMessageEvents.ALLOW_CHAT.invoker().allowChat(fullMessage);
 
             index = (index + 1) % asciiChars.length;
             lastMessageTime = System.currentTimeMillis();
