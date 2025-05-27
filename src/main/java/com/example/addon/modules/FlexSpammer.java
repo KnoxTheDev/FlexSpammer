@@ -8,8 +8,9 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-// No longer directly importing ChatMessageC2SPacket as we'll use a higher-level API.
-// import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket; // Remove this line
+import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket; // Keep this
+import net.minecraft.text.Text; // May need this if direct String constructor is problematic
+import net.minecraft.client.network.ClientPlayerEntity; // Explicitly import ClientPlayerEntity for clarity
 
 public class FlexSpammer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -38,7 +39,7 @@ public class FlexSpammer extends Module {
         super(AddonTemplate.CATEGORY, "flex-spammer", "Sends a message with anti-spam variation to bypass debounce.");
     }
 
-    @Override // It's good practice to add @Override for event handlers if they are overriding a method, though not strictly necessary here.
+    // Removed @Override from onTick as it's not overriding a superclass method
     @EventHandler
     private void onTick(TickEvent.Post event) {
         if (System.currentTimeMillis() - lastMessageTime < delay.get()) return;
@@ -47,17 +48,18 @@ public class FlexSpammer extends Module {
             String suffix = String.valueOf(asciiChars[index]);
             String fullMessage = baseMessage.get() + "       " + suffix;
 
-            // This is the correct and recommended way to send a chat message
-            // in Minecraft 1.19.x and newer, including 1.21.5.
-            // It uses the built-in method on the client player entity.
-            mc.player.sendChatMessage(fullMessage);
+            // This is the most common and robust way to send a chat message packet
+            // for versions where .sendChatMessage(String) isn't directly available
+            // but the String constructor for ChatMessageC2SPacket exists.
+            // If this still fails, your version of ChatMessageC2SPacket might
+            // require a Text object, or be an even older/different constructor.
+            mc.player.networkHandler.sendPacket(new ChatMessageC2SPacket(fullMessage));
 
             index = (index + 1) % asciiChars.length;
             lastMessageTime = System.currentTimeMillis();
         }
     }
 
-    // Optional: Add onActivate and onDeactivate for better module lifecycle management
     @Override
     public void onActivate() {
         super.onActivate();
