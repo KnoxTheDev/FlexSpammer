@@ -8,8 +8,8 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-// import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket; // No longer directly needed
-// import net.minecraft.text.Text; // Still not directly needed for sending raw strings.
+// No longer directly importing ChatMessageC2SPacket as we'll use a higher-level API.
+// import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket; // Remove this line
 
 public class FlexSpammer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -38,19 +38,37 @@ public class FlexSpammer extends Module {
         super(AddonTemplate.CATEGORY, "flex-spammer", "Sends a message with anti-spam variation to bypass debounce.");
     }
 
+    @Override // It's good practice to add @Override for event handlers if they are overriding a method, though not strictly necessary here.
     @EventHandler
     private void onTick(TickEvent.Post event) {
         if (System.currentTimeMillis() - lastMessageTime < delay.get()) return;
 
         if (mc.player != null) {
             String suffix = String.valueOf(asciiChars[index]);
-            String fullMessage = baseMessage.get() + "       " + suffix; // Added more spaces for better visibility of suffix
+            String fullMessage = baseMessage.get() + "       " + suffix;
 
-            // Correct way to send a chat message using the player's chat capabilities
+            // This is the correct and recommended way to send a chat message
+            // in Minecraft 1.19.x and newer, including 1.21.5.
+            // It uses the built-in method on the client player entity.
             mc.player.sendChatMessage(fullMessage);
 
             index = (index + 1) % asciiChars.length;
             lastMessageTime = System.currentTimeMillis();
         }
+    }
+
+    // Optional: Add onActivate and onDeactivate for better module lifecycle management
+    @Override
+    public void onActivate() {
+        super.onActivate();
+        // Reset state when module is activated
+        index = 0;
+        lastMessageTime = 0;
+    }
+
+    @Override
+    public void onDeactivate() {
+        super.onDeactivate();
+        // Any cleanup if necessary
     }
 }
