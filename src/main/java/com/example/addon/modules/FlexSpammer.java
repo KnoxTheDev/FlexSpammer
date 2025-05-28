@@ -3,11 +3,9 @@ package com.example.addon.modules;
 import com.example.addon.AddonTemplate;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.IntSetting;
-import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.orbit.EventHandler;
 
 import java.io.File;
@@ -20,35 +18,26 @@ import com.google.gson.reflect.TypeToken;
 public class FlexSpammer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
-    private final Setting<String> baseMessage = sgGeneral.add(new StringSetting.Builder()
-        .name("base-message")
-        .description("Fallback message to send if JSON messages fail to load.")
-        .defaultValue("Meteor on crack!")
-        .build()
-    );
-
-    private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
+    private final IntSetting delay = sgGeneral.add(new IntSetting.Builder()
         .name("delay-ms")
-        .description("Delay between messages in milliseconds.")
+        .description("Base delay between messages in milliseconds (adaptive jitter applied).")
         .defaultValue(3050)
         .min(1000)
         .sliderMax(10000)
         .build()
     );
 
-    // File path to load JSON messages (relative to Minecraft directory)
     private final String jsonMessagesFile = "flex_msgs.json";
+    private final String fallbackMessage = "Meteor on crack!";
 
     private List<String> rawMessages = new ArrayList<>();
-    private List<String> shuffledMessages = new ArrayList<>();
     private int msgPointer = 0;
-    private String lastMsg = "";
+    private String lastRawMsg = "";
 
     private final char[] asciiChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
     private int asciiIndex = 0;
     private long lastMessageTime = 0;
 
-    // Homoglyphs map with visually similar characters that do NOT cut or distort the letter shape
     private static final Map<Character, char[]> homoglyphsMap = new HashMap<>();
     static {
         // Lowercase letters
@@ -121,17 +110,25 @@ public class FlexSpammer extends Module {
     }
 
     public FlexSpammer() {
-        super(AddonTemplate.CATEGORY, "flex-spammer", "Sends a message with anti-spam variation to bypass debounce.");
+        super(AddonTemplate.CATEGORY, "flex-spammer", "Sends unique messages with anti-spam variations to bypass debounce.");
+    }
+
+    @Override
+    public void onActivate() {
         loadMessagesFromFile();
+        msgPointer = 0;
+        lastRawMsg = "";
+        asciiIndex = 0;
+        lastMessageTime = 0;
+        info("FlexSpammer activated with " + rawMessages.size() + " messages.");
     }
 
     private void loadMessagesFromFile() {
         File file = new File(mc.runDirectory, jsonMessagesFile);
         if (!file.exists()) {
-            info("Message JSON file not found, using fallback base message.");
+            info("Message JSON file not found, using fallback message.");
             rawMessages.clear();
-            rawMessages.add(baseMessage.get());
-            shuffledMessages = new ArrayList<>(rawMessages);
+            rawMessages.add(fallbackMessage);
             return;
         }
 
@@ -139,42 +136,18 @@ public class FlexSpammer extends Module {
             Gson gson = new Gson();
             List<String> loaded = gson.fromJson(reader, new TypeToken<List<String>>(){}.getType());
 
-            // Replace special dots with spaces (like your JS code)
             rawMessages.clear();
             for (String msg : loaded) {
-                rawMessages.add(msg.replace('·', ' ').replace('•', ' '));
+                // Replace special dots with spaces (same as before)
+                rawMessages.add(msg.replace('·', ' ').replace('•', ' ').trim());
             }
-
-            shuffledMessages = shuffleList(rawMessages);
-            msgPointer = 0;
-            lastMsg = "";
-
-            info("Loaded " + rawMessages.size() + " messages from JSON.");
+            // Sort alphabetically for sequential sending
+            Collections.sort(rawMessages, String.CASE_INSENSITIVE_ORDER);
         } catch (IOException e) {
             error("Failed to load messages JSON: " + e.getMessage());
             rawMessages.clear();
-            rawMessages.add(baseMessage.get());
-            shuffledMessages = new ArrayList<>(rawMessages);
+            rawMessages.add(fallbackMessage);
         }
-    }
-
-    private static <T> List<T> shuffleList(List<T> list) {
-        List<T> copy = new ArrayList<>(list);
-        Collections.shuffle(copy);
-        return copy;
-    }
-
-    private String getBaseMessage() {
-        if (msgPointer >= shuffledMessages.size()) {
-            shuffledMessages = shuffleList(rawMessages);
-            msgPointer = 0;
-        }
-        String candidate;
-        do {
-            candidate = shuffledMessages.get(msgPointer++);
-        } while (candidate.equals(lastMsg) && shuffledMessages.size() > 1);
-        lastMsg = candidate;
-        return candidate;
     }
 
     private String unicodeMutate(String text, double intensity) {
@@ -197,8 +170,9 @@ public class FlexSpammer extends Module {
             }
 
             // Homoglyph substitution
-            if (homoglyphsMap.containsKey(Character.toLowerCase(ch)) && random.nextDouble() < homChance) {
-                char[] variants = homoglyphsMap.get(Character.toLowerCase(ch));
+            char baseChar = Character.toLowerCase(ch);
+            if (homoglyphsMap.containsKey(baseChar) && random.nextDouble() < homChance) {
+                char[] variants = homoglyphsMap.get(baseChar);
                 ch = variants[random.nextInt(variants.length)];
             }
 
@@ -213,38 +187,52 @@ public class FlexSpammer extends Module {
         return sb.toString();
     }
 
-    private String getNextMessage() {
-        Random random = new Random();
+    private String generateNextMessage() {
+        if (msgPointer >= rawMessages.size()) return null;
 
-        // 25% chance to repeat last message with suffix tweak
-        if (random.nextDouble() < 0.25 && !lastMsg.isEmpty()) {
-            String modMsg = lastMsg;
+        String rawMsg = rawMessages.get(msgPointer++);
 
-            if (random.nextBoolean()) modMsg = modMsg.toUpperCase();
-            else if (random.nextBoolean()) modMsg = modMsg.toLowerCase();
-
-            String[] suffixes = new String[] {"...", " ?", " ¯\\_(ツ)_/¯", "!", " ಠ_ಠ", " >:("};
-            modMsg += suffixes[random.nextInt(suffixes.length)];
-
-            lastMsg = modMsg;
-            return modMsg + "     " + asciiChars[asciiIndex++ % asciiChars.length];
+        // Avoid repeating the exact same raw message (case-insensitive)
+        if (lastRawMsg.equalsIgnoreCase(rawMsg)) {
+            if (msgPointer < rawMessages.size()) {
+                rawMsg = rawMessages.get(msgPointer++);
+            }
         }
 
-        double intensity = 0.1 + random.nextDouble() * 0.2; // 0.1 to 0.3
-        String base = getBaseMessage();
-        String msg = unicodeMutate(base, intensity) + "     " + asciiChars[asciiIndex++ % asciiChars.length];
-        lastMsg = msg;
-        return msg;
+        lastRawMsg = rawMsg;
+
+        // Add suffix ASCII char cycling
+        char suffix = asciiChars[asciiIndex++ % asciiChars.length];
+
+        // Light unicode mutation to avoid spam filters, intensity low (0.1 - 0.3)
+        double intensity = 0.1 + new Random().nextDouble() * 0.2;
+        String mutatedMsg = unicodeMutate(rawMsg, intensity);
+
+        return mutatedMsg + "     " + suffix;
     }
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (System.currentTimeMillis() - lastMessageTime < delay.get()) return;
+        if (mc.player == null) return;
 
-        if (mc.player != null) {
-            String message = getNextMessage();
-            ChatUtils.sendPlayerMsg(message);
-            lastMessageTime = System.currentTimeMillis();
+        long now = System.currentTimeMillis();
+
+        // Adaptive delay with +/-30% jitter
+        int baseDelay = delay.get();
+        long adaptiveDelay = (long) (baseDelay * (0.7 + new Random().nextDouble() * 0.6));
+
+        if (now - lastMessageTime < adaptiveDelay) return;
+
+        String nextMsg = generateNextMessage();
+
+        if (nextMsg == null) {
+            // No more messages, disable module and notify
+            ChatUtils.sendPlayerMsg("§6[FlexSpammer] §aAll messages have been sent.");
+            this.toggle();
+            return;
         }
+
+        ChatUtils.sendPlayerMsg(nextMsg);
+        lastMessageTime = now;
     }
 }
