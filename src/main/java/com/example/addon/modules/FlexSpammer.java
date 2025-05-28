@@ -7,6 +7,7 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import meteordevelopment.meteorclient.settings.StringSetting;
 import meteordevelopment.orbit.EventHandler;
 
 import java.io.File;
