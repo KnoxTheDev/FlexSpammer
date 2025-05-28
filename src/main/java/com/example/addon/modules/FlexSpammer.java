@@ -6,6 +6,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.text.Text;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -213,13 +214,13 @@ public class FlexSpammer extends Module {
 
     @EventHandler
     private void onReceiveMessage(ReceiveMessageEvent event) {
-        String text = event.getMessage();
+        String text = event.getMessage().getString();  // ← call getString() here
         if (text.toLowerCase().contains("have been muted")) {
             Matcher m = MUTE_PATTERN.matcher(text);
             if (m.find()) {
                 int secs = Integer.parseInt(m.group(1));
                 info("Detected mute for " + secs + "s.");
-                // Optionally: currentDelay = Math.min(MAX_DELAY, secs * 1000 * 1.2);
+                currentDelay = Math.min(MAX_DELAY, secs * 1000 * 1.2);
             } else {
                 info("Detected mute notification.");
             }
